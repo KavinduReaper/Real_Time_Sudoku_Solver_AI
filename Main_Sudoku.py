@@ -66,7 +66,7 @@ if __name__ == '__main__':
         contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         contour_grid = None
         maxArea = 0
-        # Go through every contour to identify the largest rectangle polygon as Sudoku Puzzle
+        # Go through every contour to identify the largest rectangle polygon as SudokuClass Puzzle
         for c in contours:
             area = cv2.contourArea(c)
             if area > 25000:
@@ -127,7 +127,7 @@ if __name__ == '__main__':
                     Input.append(temp)
                 t0 = time.time()
                 # Solving the sudoku puzzle
-                result, done, msg = solveSudoku(Input, verbose=False, all_solutions=False)
+                result, done, msg = solveSudoku(Input, all_solutions=False)
                 deltaT = time.time() - t0
 
             x, y, w, h = 0, 0, 175, 75
