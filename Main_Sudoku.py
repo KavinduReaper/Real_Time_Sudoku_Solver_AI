@@ -4,7 +4,6 @@
 #######################################
 """
 
-
 # Import necessary libraries
 import operator
 import time
@@ -153,8 +152,7 @@ if __name__ == '__main__':
                 for y in range(len(result)):
                     for x in range(len(result[y])):
                         if grid_txt[y][x] == "0":
-                            cv2.putText(fond, str(result[y][x]), (x * box + margin + 3,
-                                                                  (y + 1) * box - margin - 3),
+                            cv2.putText(fond, str(result[y][x]), (x * box + margin + 3, (y + 1) * box - margin - 3),
                                         cv2.FONT_HERSHEY_SCRIPT_COMPLEX, 0.9, (0, 255, 0))
                 # Add the results to the frame that has real size of the frame
                 M = cv2.getPerspectiveTransform(pts2, pts1)
