@@ -38,7 +38,7 @@ def printBoard(board):
 
 if __name__ == '__main__':
     # Load digit recognition model
-    classifier = load_model("Model/digit_model.h5")
+    classifier = load_model("Model/digitRecognizingModel.h5")
 
     margin = 4
     box = 28 + 2 * margin
@@ -47,9 +47,8 @@ if __name__ == '__main__':
     # Start web cam
     cap = cv2.VideoCapture(0)
     # Save video
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')
     flag = 0
-    out = cv2.VideoWriter('output.avi', fourcc, 30.0, (1080, 620))
+    out = cv2.VideoWriter('output.avi', cv2.VideoWriter_fourcc(*'XVID'), 30.0, (1080, 620))
 
     while True:
         # Read video frame by frame
@@ -60,27 +59,28 @@ if __name__ == '__main__':
         # Convert frame image as gray scale image
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         # Convert image into blur image
-        gray = cv2.GaussianBlur(gray, (7, 7), 0)
-        thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 9, 2)
+        blur = cv2.GaussianBlur(gray, (7, 7), 0)
+        # Thresholding
+        thresh = cv2.adaptiveThreshold(blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 9, 2)
         # Find the contour of the image
-        contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        contour_grid = None
+        contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        contourGrid = None
         maxArea = 0
         # Go through every contour to identify the largest rectangle polygon as SudokuClass Puzzle
-        for c in contours:
-            area = cv2.contourArea(c)
+        for contour in contours:
+            area = cv2.contourArea(contour)
             if area > 25000:
-                peri = cv2.arcLength(c, True)
-                polygon = cv2.approxPolyDP(c, 0.01 * peri, True)
+                contourPerimeter = cv2.arcLength(contour, True)
+                polygon = cv2.approxPolyDP(contour, 0.01 * contourPerimeter, True)
                 if area > maxArea and len(polygon) == 4:
-                    contour_grid = polygon
+                    contourGrid = polygon
                     maxArea = area
 
-        if contour_grid is not None:
+        if contourGrid is not None:
             # Draw the outline of the puzzle
-            cv2.drawContours(frame, [contour_grid], 0, (0, 255, 0), 2)
+            cv2.drawContours(frame, [contourGrid], 0, (0, 255, 0), 2)
             # Extract the pixel values of the corner of the puzzle
-            points = np.vstack(contour_grid).squeeze()
+            points = np.vstack(contourGrid).squeeze()
             """ According to those points extract the puzzle grid """
             points = sorted(points, key=operator.itemgetter(1))
             if points[0][0] < points[1][0]:
@@ -156,7 +156,7 @@ if __name__ == '__main__':
                                         cv2.FONT_HERSHEY_SCRIPT_COMPLEX, 0.9, (0, 255, 0))
                 # Add the results to the frame that has real size of the frame
                 M = cv2.getPerspectiveTransform(pts2, pts1)
-                h, w, c = frame.shape
+                h, w, contour = frame.shape
                 fondP = cv2.warpPerspective(fond, M, (w, h))
                 # Convert the image into grayscale image
                 img2gray = cv2.cvtColor(fondP, cv2.COLOR_BGR2GRAY)
